@@ -49,11 +49,11 @@ public class Auth {
 
     // Load client secrets.
     Reader clientSecretReader = new InputStreamReader(Auth.class.getResourceAsStream("/client_secrets.json"));
+    System.out.println("ggggggg");
     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
 
     // Checks that the defaults have been replaced (Default = "Enter X here").
-    if (clientSecrets.getDetails().getClientId().startsWith("Enter")
-      || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
+    if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
       System.out.println(
         "Enter Client ID and Secret from https://console.developers.google.com/project/_/apiui/credential "
           + "into src/main/resources/client_secrets.json");
