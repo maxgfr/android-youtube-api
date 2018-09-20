@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-        applicationId "com.example.quickstart"
+        applicationId "com.example.golfier.android_youtube_api"
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
