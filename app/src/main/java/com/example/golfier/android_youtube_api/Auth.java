@@ -2,8 +2,6 @@ package com.example.golfier.android_youtube_api;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.StoredCredential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.HttpTransport;
@@ -55,8 +53,8 @@ public class Auth {
     // Checks that the defaults have been replaced (Default = "Enter X here").
     if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
       System.out.println(
-        "Enter Client ID and Secret from https://console.developers.google.com/project/_/apiui/credential "
-          + "into src/main/resources/client_secrets.json");
+              "Enter Client ID and Secret from https://console.developers.google.com/project/_/apiui/credential "
+                      + "into src/main/resources/client_secrets.json");
       System.exit(1);
     }
 
@@ -65,14 +63,11 @@ public class Auth {
     DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
 
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-      HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
-      .build();
+            HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes).setCredentialDataStore(datastore)
+            .build();
 
-    // Build the local server and bind it to port 8080
-    LocalServerReceiver localReceiver = new LocalServerReceiver.Builder().setPort(8080).build();
+    return null;
 
-    // Authorize.
-    return new AuthorizationCodeInstalledApp(flow, localReceiver).authorize("user");
+
   }
 }
-
