@@ -45,8 +45,7 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends Activity
-        implements EasyPermissions.PermissionCallbacks {
+public class MainActivity extends Activity implements EasyPermissions.PermissionCallbacks {
   GoogleAccountCredential mCredential;
   private TextView mOutputText;
   private Button mCallApiButton;

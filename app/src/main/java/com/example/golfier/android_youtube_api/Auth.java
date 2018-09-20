@@ -47,7 +47,6 @@ public class Auth {
 
     // Load client secrets.
     Reader clientSecretReader = new InputStreamReader(Auth.class.getResourceAsStream("/client_secrets.json"));
-    System.out.println("ggggggg");
     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
 
     // Checks that the defaults have been replaced (Default = "Enter X here").
