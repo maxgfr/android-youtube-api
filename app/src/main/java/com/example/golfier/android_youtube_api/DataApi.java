@@ -1,7 +1,9 @@
 package com.example.golfier.android_youtube_api;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,6 +25,8 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
 
     private GoogleAccountCredential mCredential;
     private Context context;
+    private ProgressDialog mProgress;
+    MainActivity mainActivity;
 
     private static final int REQUEST_ACCOUNT_PICKER = 1000;
     private static final int REQUEST_AUTHORIZATION = 1001;
@@ -30,13 +34,18 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
     private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_READONLY};
-    private static final String PREF_ACCOUNT_NAME = "accountName";
 
-    DataApi(Context context) {
+    DataApi(Context context, MainActivity ma) {
         // Initialize credentials and service object.
         this.context = context;
+        mProgress = new ProgressDialog(context);
         mCredential = GoogleAccountCredential.usingOAuth2(this.context, Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+        this.mainActivity = ma;
+    }
+
+    public void setNameAccount(String name) {
+        this.mCredential.setSelectedAccountName(name);
     }
 
 
@@ -47,15 +56,15 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi() {
+    public void getResultsFromApi() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (!isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
+            sendError("No network connection available.");
         } else {
-            new MainActivity.MakeRequestTask(mCredential).execute();
+            new MakeRequestTask(mCredential,mProgress).execute();
         }
     }
 
@@ -71,26 +80,19 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
-        if (EasyPermissions.hasPermissions(
-                context, Manifest.permission.GET_ACCOUNTS)) {
-            String accountName = getPreferences(Context.MODE_PRIVATE)
-                    .getString(PREF_ACCOUNT_NAME, null);
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.GET_ACCOUNTS)) {
+            String accountName = mainActivity.getPreferences(Context.MODE_PRIVATE).getString("accountName", null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
                 getResultsFromApi();
             } else {
                 // Start a dialog from which the user can choose an account
-                startActivityForResult(
-                        mCredential.newChooseAccountIntent(),
-                        REQUEST_ACCOUNT_PICKER);
+                mainActivity.startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
-            EasyPermissions.requestPermissions(
-                    this,
-                    "This app needs to access your Google account (via Contacts).",
-                    REQUEST_PERMISSION_GET_ACCOUNTS,
-                    Manifest.permission.GET_ACCOUNTS);
+            EasyPermissions.requestPermissions((Activity) context, "This app needs to access your Google account (via Contacts).", REQUEST_PERMISSION_GET_ACCOUNTS, Manifest.permission.GET_ACCOUNTS);
         }
     }
 
@@ -178,12 +180,19 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
      * @param connectionStatusCode code describing the presence (or lack of)
      *     Google Play Services on this device.
      */
-    void showGooglePlayServicesAvailabilityErrorDialog(final int connectionStatusCode) {
+    public void showGooglePlayServicesAvailabilityErrorDialog(final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog = apiAvailability.getErrorDialog(
-                MainActivity.this,
-                connectionStatusCode,
-                REQUEST_GOOGLE_PLAY_SERVICES);
+        Dialog dialog;
+        dialog = apiAvailability.getErrorDialog((Activity) context, connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
+
+    public void dispMessage(String msg) {
+        mProgress.setMessage(msg);
+    }
+
+    public void sendError(String msg) {
+        System.out.println(msg);
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.golfier.android_youtube_api;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
@@ -22,16 +24,23 @@ import java.util.List;
  * Placing the API calls in their own task ensures the UI stays responsive.
  */
 public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+
     private com.google.api.services.youtube.YouTube mService = null;
     private Exception mLastError = null;
+    private String result;
+    private int status;
+    ProgressDialog mProgress;
 
-    MakeRequestTask(GoogleAccountCredential credential) {
+    private static final int REQUEST_AUTHORIZATION = 1001;
+
+    MakeRequestTask(GoogleAccountCredential credential, ProgressDialog pd) {
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         mService = new com.google.api.services.youtube.YouTube.Builder(
                 transport, jsonFactory, credential)
-                .setApplicationName("YouTube Data API Android Quickstart")
+                .setApplicationName("DataApi")
                 .build();
+        this.mProgress = pd;
     }
 
     /**
@@ -73,7 +82,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
 
     @Override
     protected void onPreExecute() {
-        mOutputText.setText("");
+        result="";
         mProgress.show();
     }
 
@@ -81,10 +90,10 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
     protected void onPostExecute(List<String> output) {
         mProgress.hide();
         if (output == null || output.size() == 0) {
-            mOutputText.setText("No results returned.");
+            result="No results returned.";
         } else {
             output.add(0, "Data retrieved using the YouTube Data API:");
-            mOutputText.setText(TextUtils.join("\n", output));
+            result=TextUtils.join("\n", output);
         }
     }
 
@@ -93,19 +102,27 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         mProgress.hide();
         if (mLastError != null) {
             if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                showGooglePlayServicesAvailabilityErrorDialog(
-                        ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                .getConnectionStatusCode());
+                int connectionStatusCode = ((GooglePlayServicesAvailabilityIOException) mLastError).getConnectionStatusCode();
+                setStatusErr(connectionStatusCode);
             } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                startActivityForResult(
-                        ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                        MainActivity.REQUEST_AUTHORIZATION);
+                setStatusErr(this.REQUEST_AUTHORIZATION);
             } else {
-                mOutputText.setText("The following error occurred:\n"
-                        + mLastError.getMessage());
+                result="The following error occurred:\n" +mLastError.getMessage();
             }
         } else {
-            mOutputText.setText("Request cancelled.");
+            result="Request cancelled.";
         }
+    }
+
+    public String getResult () {
+        return result;
+    }
+
+    public int getStatusErr () {
+        return status;
+    }
+
+    public void setStatusErr (int nb) {
+        this.status = nb;
     }
 }
