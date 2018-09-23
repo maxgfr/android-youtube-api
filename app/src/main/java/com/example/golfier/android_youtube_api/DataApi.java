@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -24,24 +23,21 @@ import java.util.List;
 public class DataApi implements EasyPermissions.PermissionCallbacks {
 
     private GoogleAccountCredential mCredential;
-    private Context context;
+    private Activity activity;
     private ProgressDialog mProgress;
-    MainActivity mainActivity;
 
     private static final int REQUEST_ACCOUNT_PICKER = 1000;
-    private static final int REQUEST_AUTHORIZATION = 1001;
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
     private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_READONLY};
 
-    DataApi(Context context, MainActivity ma) {
+    DataApi(Activity activity) {
         // Initialize credentials and service object.
-        this.context = context;
-        mProgress = new ProgressDialog(context);
-        mCredential = GoogleAccountCredential.usingOAuth2(this.context, Arrays.asList(SCOPES))
+        this.activity = activity;
+        mProgress = new ProgressDialog(activity);
+        mCredential = GoogleAccountCredential.usingOAuth2(this.activity, Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
-        this.mainActivity = ma;
     }
 
     public void setNameAccount(String name) {
@@ -80,19 +76,19 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
-        if (EasyPermissions.hasPermissions(context, Manifest.permission.GET_ACCOUNTS)) {
-            String accountName = mainActivity.getPreferences(Context.MODE_PRIVATE).getString("accountName", null);
+        if (EasyPermissions.hasPermissions(activity, Manifest.permission.GET_ACCOUNTS)) {
+            String accountName = activity.getPreferences(Activity.MODE_PRIVATE).getString("accountName", null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
                 getResultsFromApi();
             } else {
                 // Start a dialog from which the user can choose an account
-                mainActivity.startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                activity.startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
-            EasyPermissions.requestPermissions((Activity) context, "This app needs to access your Google account (via Contacts).", REQUEST_PERMISSION_GET_ACCOUNTS, Manifest.permission.GET_ACCOUNTS);
+            EasyPermissions.requestPermissions((Activity) activity, "This app needs to access your Google account (via Contacts).", REQUEST_PERMISSION_GET_ACCOUNTS, Manifest.permission.GET_ACCOUNTS);
         }
     }
 
@@ -144,7 +140,7 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
      */
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) activity.getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
     }
@@ -157,7 +153,7 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
      */
     private boolean isGooglePlayServicesAvailable() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(context);
+        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(activity);
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
@@ -167,7 +163,7 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
      */
     private void acquireGooglePlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(context);
+        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(activity);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
@@ -183,7 +179,7 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
     public void showGooglePlayServicesAvailabilityErrorDialog(final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog;
-        dialog = apiAvailability.getErrorDialog((Activity) context, connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
+        dialog = apiAvailability.getErrorDialog(activity, connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
 

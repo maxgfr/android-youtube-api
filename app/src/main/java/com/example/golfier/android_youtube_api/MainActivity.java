@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
     setContentView(R.layout.activity_main);
     mCallApiButton = (Button) findViewById(R.id.button);
     mOutputText = (TextView) findViewById(R.id.textview);
-    myApi = new DataApi(this.getBaseContext(), this);
+    myApi = new DataApi(this);
 
     mCallApiButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
     switch(requestCode) {
       case REQUEST_GOOGLE_PLAY_SERVICES:
         if (resultCode != RESULT_OK) {
-          mOutputText.setText("This app requires Google Play Services. Please install " + "Google Play Services on your device and relaunch this app.");
+          mOutputText.setText("This app requires Google Play Services. Please install Google Play Services on your device and relaunch this app.");
         } else {
           myApi.getResultsFromApi();
         }

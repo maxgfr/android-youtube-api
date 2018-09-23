@@ -29,7 +29,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
     private Exception mLastError = null;
     private String result;
     private int status;
-    ProgressDialog mProgress;
+    private ProgressDialog mProgress;
 
     private static final int REQUEST_AUTHORIZATION = 1001;
 
@@ -83,6 +83,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
     @Override
     protected void onPreExecute() {
         result="";
+        System.out.println(result);
         mProgress.show();
     }
 
@@ -91,9 +92,11 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         mProgress.hide();
         if (output == null || output.size() == 0) {
             result="No results returned.";
+            System.out.println(result);
         } else {
             output.add(0, "Data retrieved using the YouTube Data API:");
             result=TextUtils.join("\n", output);
+            System.out.println(result);
         }
     }
 
@@ -108,9 +111,11 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
                 setStatusErr(this.REQUEST_AUTHORIZATION);
             } else {
                 result="The following error occurred:\n" +mLastError.getMessage();
+                System.out.println(result);
             }
         } else {
             result="Request cancelled.";
+            System.out.println(result);
         }
     }
 
