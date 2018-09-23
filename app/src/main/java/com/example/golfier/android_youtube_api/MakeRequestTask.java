@@ -71,14 +71,15 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         // Get a list of up to 10 files.
         List<String> channelInfo = new ArrayList<String>();
         ChannelListResponse result = mService.channels().list("snippet,contentDetails,statistics")
-                .setForUsername("GoogleDevelopers")
+                .setMine(true)
                 .execute();
         List<Channel> channels = result.getItems();
         if (channels != null) {
             Channel channel = channels.get(0);
             channelInfo.add("This channel's ID is " + channel.getId() + ". " +
                     "Its title is '" + channel.getSnippet().getTitle() + ", " +
-                    "and it has " + channel.getStatistics().getViewCount() + " views.");
+                    "and it has " + channel.getStatistics().getViewCount() + " views." +
+                    "playslist upload : " + channel.getContentDetails().getRelatedPlaylists().getUploads());
         }
         return channelInfo;
     }
@@ -96,9 +97,12 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
                     .setFields("items/contentDetails,nextPageToken,pageInfo")
                     .execute();
 
+            System.out.println(channelResult);
+
             List<Channel> channelsList = channelResult.getItems();
 
             if (channelsList != null) {
+                System.out.println(channelsList.get(0));
                 // The user's default channel is the first item in the list.
                 // Extract the playlist ID for the channel's videos from the
                 // API response.

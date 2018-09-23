@@ -76,6 +76,7 @@ public class MainActivity extends Activity {
       case REQUEST_ACCOUNT_PICKER:
         if (resultCode == RESULT_OK && data != null && data.getExtras() != null) {
           String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+          System.out.println("account name "+accountName);
           if (accountName != null) {
             SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();

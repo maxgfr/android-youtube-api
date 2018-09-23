@@ -78,8 +78,9 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(activity, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = activity.getPreferences(Activity.MODE_PRIVATE).getString("accountName", null);
+            System.out.println("account name "+accountName);
             if (accountName != null) {
-                mCredential.setSelectedAccountName(accountName);
+                this.mCredential.setSelectedAccountName(accountName);
                 getResultsFromApi();
             } else {
                 // Start a dialog from which the user can choose an account
@@ -88,7 +89,7 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
-            EasyPermissions.requestPermissions((Activity) activity, "This app needs to access your Google account (via Contacts).", REQUEST_PERMISSION_GET_ACCOUNTS, Manifest.permission.GET_ACCOUNTS);
+            EasyPermissions.requestPermissions(activity, "This app needs to access your Google account (via Contacts).", REQUEST_PERMISSION_GET_ACCOUNTS, Manifest.permission.GET_ACCOUNTS);
         }
     }
 
