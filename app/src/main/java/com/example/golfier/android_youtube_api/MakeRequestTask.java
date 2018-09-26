@@ -27,7 +27,7 @@ import java.util.List;
  * An asynchronous task that handles the YouTube Data API call.
  * Placing the API calls in their own task ensures the UI stays responsive.
  */
-public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
 
     private com.google.api.services.youtube.YouTube mService = null;
     private Exception mLastError = null;
@@ -53,14 +53,9 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
      * @param params no parameters needed for this task.
      */
     @Override
-    protected List<String> doInBackground(Void... params) {
-        try {
-            return getDataFromApi();
-        } catch (Exception e) {
-            mLastError = e;
-            cancel(true);
-            return null;
-        }
+    protected YoutubeUser doInBackground(Void... params) {
+        getDataFromApi();
+        return null;
     }
 
     /**
@@ -68,7 +63,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
      * @return List of Strings containing information about the channel.
      * @throws IOException
      */
-    private List<String> getDataFromApi2() throws IOException {
+    private List<String> getPrimaryData() throws IOException {
         // Get a list of up to 10 files.
         List<String> channelInfo = new ArrayList<String>();
         ChannelListResponse result = mService.channels().list("snippet,contentDetails,statistics")
@@ -86,13 +81,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         return channelInfo;
     }
 
-    // Call the API's channels.list method to retrieve the
-    // resource that represents the authenticated user's channel.
-    // In the API response, only include channel information needed for
-    // this use case. The channel's contentDetails part contains
-    // playlist IDs relevant to the channel, including the ID for the
-    // list that contains videos uploaded to the channel.
-    private List<String> getDataFromApi() throws IOException {
+    private void getDataFromApi() {
         try{
             ChannelListResponse channelResult = mService.channels().list("snippet,contentDetails,statistics")
                     .setMine(true)
@@ -122,8 +111,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
                 // Only retrieve data used in this application, thereby making
                 // the application more efficient. See:
                 // https://developers.google.com/youtube/v3/getting-started#partial
-                playlistItemRequest.setFields(
-                        "items(contentDetails/videoId,snippet/title,snippet/publishedAt),nextPageToken,pageInfo");
+                playlistItemRequest.setFields("items(contentDetails/videoId,snippet/title,snippet/publishedAt),nextPageToken,pageInfo");
 
                 String nextToken = "";
 
@@ -140,20 +128,76 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
                 } while (nextToken != null);
 
                 // Prints information about the results.
-                prettyPrint(playlistItemList.size(), playlistItemList.iterator());
+                processPrint(playlistItemList.size(), playlistItemList.iterator());
             }
 
         } catch (GoogleJsonResponseException e) {
             e.printStackTrace();
-            System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
-                    + e.getDetails().getMessage());
+            System.err.println("There was a service error: " + e.getDetails().getCode() + " : " + e.getDetails().getMessage());
 
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        return null;
     }
 
+    private void getDataFromApiWithName(String name) {
+        try{
+            ChannelListResponse channelResult = mService.channels().list("snippet,contentDetails,statistics")
+                    .setForUsername(name)
+                    .setFields("items/contentDetails,nextPageToken,pageInfo")
+                    .execute();
+
+            System.out.println(channelResult);
+
+            List<Channel> channelsList = channelResult.getItems();
+
+            if (channelsList != null) {
+                System.out.println(channelsList.get(0));
+                // The user's default channel is the first item in the list.
+                // Extract the playlist ID for the channel's videos from the
+                // API response.
+                String uploadPlaylistId =
+                        channelsList.get(0).getContentDetails().getRelatedPlaylists().getUploads();
+
+                // Define a list to store items in the list of uploaded videos.
+                List<PlaylistItem> playlistItemList = new ArrayList<PlaylistItem>();
+
+                // Retrieve the playlist of the channel's uploaded videos.
+                YouTube.PlaylistItems.List playlistItemRequest =
+                        mService.playlistItems().list("id,contentDetails,snippet");
+                playlistItemRequest.setPlaylistId(uploadPlaylistId);
+
+                // Only retrieve data used in this application, thereby making
+                // the application more efficient. See:
+                // https://developers.google.com/youtube/v3/getting-started#partial
+                playlistItemRequest.setFields("items(contentDetails/videoId,snippet/title,snippet/publishedAt),nextPageToken,pageInfo");
+
+                String nextToken = "";
+
+                // Call the API one or more times to retrieve all items in the
+                // list. As long as the API response returns a nextPageToken,
+                // there are still more items to retrieve.
+                do {
+                    playlistItemRequest.setPageToken(nextToken);
+                    PlaylistItemListResponse playlistItemResult = playlistItemRequest.execute();
+
+                    playlistItemList.addAll(playlistItemResult.getItems());
+
+                    nextToken = playlistItemResult.getNextPageToken();
+                } while (nextToken != null);
+
+                // Prints information about the results.
+                processPrint(playlistItemList.size(), playlistItemList.iterator());
+            }
+
+        } catch (GoogleJsonResponseException e) {
+            e.printStackTrace();
+            System.err.println("There was a service error: " + e.getDetails().getCode() + " : " + e.getDetails().getMessage());
+
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
     @Override
     protected void onPreExecute() {
@@ -162,13 +206,12 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
     }
 
     @Override
-    protected void onPostExecute(List<String> output) {
+    protected void onPostExecute(YoutubeUser output) {
         mProgress.hide();
-        if (output == null || output.size() == 0) {
+        if (output == null) {
             ri.addInfo("No results returned.");
         } else {
-            output.add(0, "Data retrieved using the YouTube Data API:");
-            ri.addInfo(TextUtils.join("\n", output));
+            ri.addInfo("Data retrieved using the YouTube Data API:");
         }
     }
 
@@ -197,23 +240,28 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
      *
      * @param iterator of Playlist Items from uploaded Playlist
      */
-    private void prettyPrint(int size, Iterator<PlaylistItem> playlistEntries) {
+    private void processPrint(int size, Iterator<PlaylistItem> playlistEntries) {
+
+        List<YoutubeVideo> myVideo = new ArrayList<>();
+
         System.out.println("=============================================================");
         System.out.println("\t\tTotal Videos Uploaded: " + size);
         System.out.println("=============================================================\n");
 
-        List<YoutubeVideo> myVideo = new ArrayList<>();
-
         while (playlistEntries.hasNext()) {
+
             PlaylistItem playlistItem = playlistEntries.next();
+
             System.out.println(" video name  = " + playlistItem.getSnippet().getTitle());
             System.out.println(" video id    = " + playlistItem.getContentDetails().getVideoId());
             System.out.println(" upload date = " + playlistItem.getSnippet().getPublishedAt());
             System.out.println("\n-------------------------------------------------------------\n");
+
             YoutubeVideo vid = new YoutubeVideo(playlistItem.getSnippet().getTitle(),
                     playlistItem.getContentDetails().getVideoId(),
                     playlistItem.getSnippet().getPublishedAt().toString());
             myVideo.add(vid);
+
         }
         youtubeUser.addVideoContent(myVideo);
     }

@@ -35,7 +35,7 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
     DataApi(Activity activity) {
         // Initialize credentials and service object.
         this.activity = activity;
-        mProgress = new ProgressDialog(activity);
+        mProgress = new ProgressDialog(this.activity);
         mCredential = GoogleAccountCredential.usingOAuth2(this.activity, Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
     }
