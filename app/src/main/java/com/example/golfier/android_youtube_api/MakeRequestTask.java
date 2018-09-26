@@ -219,6 +219,8 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         System.out.println("\t\tTotal Videos Uploaded: " + size);
         System.out.println("=============================================================\n");
 
+        List<String> myVideoId = new A
+
         while (playlistEntries.hasNext()) {
             PlaylistItem playlistItem = playlistEntries.next();
             System.out.println(" video name  = " + playlistItem.getSnippet().getTitle());
