@@ -11,7 +11,7 @@ public class YoutubeUser {
     private List<String> listId;
     private List<String> listTitle;
     private List<String> listChannelIdUpload;
-    private List<String> listUpload;
+    private List<YoutubeVideo> listUpload;
     private List<BigInteger> listViewCount;
 
     public YoutubeUser() {
@@ -48,12 +48,12 @@ public class YoutubeUser {
         return listViewCount;
     }
 
-    public List<String> getListUpload() {
+    public List<YoutubeVideo> getListUpload() {
 
         return listUpload;
     }
 
-    public void setListUpload(List<String> listUpload) {
+    public void setListUpload(List<YoutubeVideo> listUpload) {
         this.listUpload = listUpload;
     }
 
@@ -88,7 +88,7 @@ public class YoutubeUser {
         this.listViewCount.add(viewCount);
     }
 
-    public void addVideoContent(List<String> videoId) {
+    public void addVideoContent(List<YoutubeVideo> videoId) {
         this.listUpload.addAll(videoId);
     }
 }

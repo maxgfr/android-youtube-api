@@ -214,12 +214,12 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
      *
      * @param iterator of Playlist Items from uploaded Playlist
      */
-    private static void prettyPrint(int size, Iterator<PlaylistItem> playlistEntries) {
+    private void prettyPrint(int size, Iterator<PlaylistItem> playlistEntries) {
         System.out.println("=============================================================");
         System.out.println("\t\tTotal Videos Uploaded: " + size);
         System.out.println("=============================================================\n");
 
-        List<String> myVideoId = new A
+        List<YoutubeVideo> myVideo = new ArrayList<>();
 
         while (playlistEntries.hasNext()) {
             PlaylistItem playlistItem = playlistEntries.next();
@@ -227,6 +227,11 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
             System.out.println(" video id    = " + playlistItem.getContentDetails().getVideoId());
             System.out.println(" upload date = " + playlistItem.getSnippet().getPublishedAt());
             System.out.println("\n-------------------------------------------------------------\n");
+            YoutubeVideo vid = new YoutubeVideo(playlistItem.getSnippet().getTitle(),
+                    playlistItem.getContentDetails().getVideoId(),
+                    playlistItem.getSnippet().getPublishedAt().toString());
+            myVideo.add(vid);
         }
+        youtubeUser.addVideoContent(myVideo);
     }
 }
