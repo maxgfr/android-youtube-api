@@ -34,6 +34,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
     private String result;
     private int status;
     private ProgressDialog mProgress;
+    private YoutubeUser youtubeUser;
 
     private static final int REQUEST_AUTHORIZATION = 1001;
 
@@ -45,6 +46,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
                 .setApplicationName("DataApi")
                 .build();
         this.mProgress = pd;
+        youtubeUser = new YoutubeUser();
     }
 
     /**
@@ -76,6 +78,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         List<Channel> channels = result.getItems();
         if (channels != null) {
             Channel channel = channels.get(0);
+            youtubeUser.addInformation(channel.getId(), channel.getSnippet().getTitle(), channel.getStatistics().getViewCount(), channel.getContentDetails().getRelatedPlaylists().getUploads());
             channelInfo.add("This channel's ID is " + channel.getId() + ". " +
                     "Its title is '" + channel.getSnippet().getTitle() + ", " +
                     "and it has " + channel.getStatistics().getViewCount() + " views." +
