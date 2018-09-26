@@ -31,10 +31,9 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
 
     private com.google.api.services.youtube.YouTube mService = null;
     private Exception mLastError = null;
-    private String result;
-    private int status;
     private ProgressDialog mProgress;
     private YoutubeUser youtubeUser;
+    private RequestInfo ri = RequestInfo.getInstance();
 
     private static final int REQUEST_AUTHORIZATION = 1001;
 
@@ -158,8 +157,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
 
     @Override
     protected void onPreExecute() {
-        result="";
-        System.out.println(result);
+        ri.addInfo("");
         mProgress.show();
     }
 
@@ -167,12 +165,10 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
     protected void onPostExecute(List<String> output) {
         mProgress.hide();
         if (output == null || output.size() == 0) {
-            result="No results returned.";
-            System.out.println(result);
+            ri.addInfo("No results returned.");
         } else {
             output.add(0, "Data retrieved using the YouTube Data API:");
-            result=TextUtils.join("\n", output);
-            System.out.println(result);
+            ri.addInfo(TextUtils.join("\n", output));
         }
     }
 
@@ -182,30 +178,17 @@ public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         if (mLastError != null) {
             if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
                 int connectionStatusCode = ((GooglePlayServicesAvailabilityIOException) mLastError).getConnectionStatusCode();
-                setStatusErr(connectionStatusCode);
+                ri.addStatus(connectionStatusCode);
             } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                setStatusErr(this.REQUEST_AUTHORIZATION);
+                ri.addStatus(this.REQUEST_AUTHORIZATION);
             } else {
-                result="The following error occurred:\n" +mLastError.getMessage();
-                System.out.println(result);
+                ri.addInfo("The following error occurred:\n" +mLastError.getMessage());
             }
         } else {
-            result="Request cancelled.";
-            System.out.println(result);
+            ri.addInfo("Request cancelled.");
         }
     }
 
-    public String getResult () {
-        return result;
-    }
-
-    public int getStatusErr () {
-        return status;
-    }
-
-    public void setStatusErr (int nb) {
-        this.status = nb;
-    }
 
     /*
      * Print information about all of the items in the playlist.
