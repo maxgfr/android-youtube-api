@@ -13,6 +13,7 @@ public class YoutubeUser {
     private List<String> listChannelIdUpload;
     private List<YoutubeVideo> listUpload;
     private List<BigInteger> listViewCount;
+    private Integer nbSubscriber;
 
     public YoutubeUser() {
         accountMail="";
@@ -53,16 +54,24 @@ public class YoutubeUser {
         return listUpload;
     }
 
+    public Integer getNbSubscriber() {
+        return nbSubscriber;
+    }
+
+    public void setNbSubscriber(Integer nbSubscriber) {
+        this.nbSubscriber = nbSubscriber;
+    }
+
     public void setListUpload(List<YoutubeVideo> listUpload) {
         this.listUpload = listUpload;
     }
 
     public void setAccountMail(String accountMail) {
         this.accountMail = accountMail;
-    }
-
-    public void setPossibleUserName(String possibleUserName) {
-        this.possibleUserName = possibleUserName;
+        //Set the possible username
+        int index = accountMail.indexOf("@");
+        this.possibleUserName = accountMail.substring(0, index);
+        System.out.println("POSSIBLE USERNAME is : "+this.possibleUserName);
     }
 
     public void setListId(List<String> listId) {
@@ -102,6 +111,7 @@ public class YoutubeUser {
         return "YoutubeUser{" +
                 "accountMail='" + accountMail + '\'' +
                 ", possibleUserName='" + possibleUserName + '\'' +
+                ", nbSubscriber='" + nbSubscriber + '\'' +
                 ", listId=" + listId +
                 ", listTitle=" + listTitle +
                 ", listChannelIdUpload=" + listChannelIdUpload +

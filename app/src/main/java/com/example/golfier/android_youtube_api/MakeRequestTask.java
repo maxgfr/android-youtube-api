@@ -43,6 +43,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
         this.ri = RequestInfo.getInstance();
         this.mProgress = pd;
         this.youtubeUser = new YoutubeUser();
+        this.youtubeUser.setAccountMail(this.credential.getSelectedAccountName());
     }
 
     @Override
@@ -147,7 +148,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
         System.out.println(output.toString());
         if (output.getNbVideo() == 0) {
             System.out.println("Launch the second asynchronous task");
-            //new MakeRequestTaskName(this.credential,this.mProgress, youtubeUser.getPossibleUserName()).execute();
+            new MakeRequestTaskName(this.credential,this.mProgress, youtubeUser.getPossibleUserName()).execute();
         }
     }
 

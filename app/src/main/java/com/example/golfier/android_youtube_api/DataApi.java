@@ -78,7 +78,6 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(activity, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = activity.getPreferences(Activity.MODE_PRIVATE).getString("accountName", null);
-            System.out.println("account name "+accountName);
             if (accountName != null) {
                 this.mCredential.setSelectedAccountName(accountName);
                 getResultsFromApi();
