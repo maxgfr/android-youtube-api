@@ -91,4 +91,30 @@ public class YoutubeUser {
     public void addVideoContent(List<YoutubeVideo> videoId) {
         this.listUpload.addAll(videoId);
     }
+
+    @Override
+    public String toString() {
+        String str = "\n";
+        int i = 1;
+        for(YoutubeVideo yv : listUpload) {
+            str += "VIDEO ID num."+i+" "+yv.getVideoId()+"\n";
+        }
+        return "YoutubeUser{" +
+                "accountMail='" + accountMail + '\'' +
+                ", possibleUserName='" + possibleUserName + '\'' +
+                ", listId=" + listId +
+                ", listTitle=" + listTitle +
+                ", listChannelIdUpload=" + listChannelIdUpload +
+                ", listUpload=" + str +
+                ", listViewCount=" + listViewCount +
+                '}';
+    }
+
+    public void addUpload(String uploads) {
+        this.listChannelIdUpload.add(uploads);
+    }
+
+    public int getNbVideo() {
+        return this.listUpload.size();
+    }
 }

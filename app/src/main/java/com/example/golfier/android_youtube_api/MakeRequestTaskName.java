@@ -23,17 +23,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
+/**
+ * An asynchronous task that handles the YouTube Data API call.
+ * Placing the API calls in their own task ensures the UI stays responsive.
+ */
+public class MakeRequestTaskName extends AsyncTask<Void, Void, YoutubeUser> {
 
     private com.google.api.services.youtube.YouTube mService = null;
-    private GoogleAccountCredential credential;
     private ProgressDialog mProgress;
     private YoutubeUser youtubeUser;
     private RequestInfo ri;
+    private String possibleName;
 
-    MakeRequestTask(GoogleAccountCredential credential, ProgressDialog pd) {
-        this.credential =credential;
+    MakeRequestTaskName(GoogleAccountCredential credential, ProgressDialog pd, String name) {
+
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         mService = new com.google.api.services.youtube.YouTube.Builder(
@@ -43,19 +46,21 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
         this.ri = RequestInfo.getInstance();
         this.mProgress = pd;
         this.youtubeUser = new YoutubeUser();
+        this.possibleName = name;
     }
+
 
     @Override
     protected YoutubeUser doInBackground(Void... params) {
-        getDataFromApi();
+        getDataFromApi(this.possibleName);
         return youtubeUser;
     }
 
-    private void getDataFromApi() {
+    private void getDataFromApi(String name) {
         ChannelListResponse channelResult = null;
         try {
             channelResult = mService.channels().list("snippet,contentDetails,statistics")
-                    .setMine(true)
+                    .setForUsername(name)
                     .setFields("items/contentDetails,nextPageToken,pageInfo")
                     .execute();
 
@@ -145,10 +150,6 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
             ri.addInfo("Data retrieved using the YouTube Data API:");
         }
         System.out.println(output.toString());
-        if (output.getNbVideo() == 0) {
-            System.out.println("Launch the second asynchronous task");
-            //new MakeRequestTaskName(this.credential,this.mProgress, youtubeUser.getPossibleUserName()).execute();
-        }
     }
 
     @Override
@@ -156,5 +157,4 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
         mProgress.hide();
         ri.addInfo("Request cancelled.");
     }
-
 }
