@@ -60,7 +60,7 @@ public class DataApi implements EasyPermissions.PermissionCallbacks {
         } else if (!isDeviceOnline()) {
             sendError("No network connection available.");
         } else {
-            new MakeRequestTask(mCredential,mProgress).execute();
+            new MakeRequestTask(mCredential,mProgress, activity).execute();
         }
     }
 

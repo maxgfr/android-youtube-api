@@ -18,9 +18,9 @@ public class MainActivity extends Activity {
   private Button mCallApiButton;
   private DataApi myApi;
 
-  private static final int REQUEST_ACCOUNT_PICKER = 1000;
-  private static final int REQUEST_AUTHORIZATION = 1001;
-  private static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+  public static final int REQUEST_ACCOUNT_PICKER = 1000;
+  public static final int REQUEST_AUTHORIZATION = 1001;
+  public static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
 
   private static final String PREF_ACCOUNT_NAME = "accountName";
 

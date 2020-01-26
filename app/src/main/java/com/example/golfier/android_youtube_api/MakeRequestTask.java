@@ -1,5 +1,6 @@
 package com.example.golfier.android_youtube_api;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -31,8 +32,9 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
     private ProgressDialog mProgress;
     private YoutubeUser youtubeUser;
     private RequestInfo ri;
+    private Activity activity;
 
-    MakeRequestTask(GoogleAccountCredential credential, ProgressDialog pd) {
+    MakeRequestTask(GoogleAccountCredential credential, ProgressDialog pd, Activity activity) {
         this.credential =credential;
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
@@ -44,6 +46,7 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
         this.mProgress = pd;
         this.youtubeUser = new YoutubeUser();
         this.youtubeUser.setAccountMail(this.credential.getSelectedAccountName());
+        this.activity = activity;
     }
 
     @Override
@@ -108,7 +111,13 @@ public class MakeRequestTask extends AsyncTask<Void, Void, YoutubeUser> {
                 processInfo(playlistItemList.iterator());
             }
 
-        } catch (GoogleJsonResponseException e) {
+        } catch (UserRecoverableAuthIOException e) {
+            System.out.println("UserRecoverableAuthIOException");
+            this.activity.startActivityForResult(
+                    ((UserRecoverableAuthIOException) e).getIntent(),
+                    MainActivity.REQUEST_AUTHORIZATION);
+        }
+        catch (GoogleJsonResponseException e) {
             e.printStackTrace();
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : " + e.getDetails().getMessage());
 
