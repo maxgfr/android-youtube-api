@@ -3,9 +3,9 @@
 ## Tech Stack
 maxgfr/android-youtube-api is built on the following main stack:
 
-- [Gradle](https://www.gradle.org/) – Java Build Tools
 - [Java](https://www.java.com) – Languages
 - [Android SDK](http://developer.android.com) – Frameworks (Full Stack)
+- [Gradle](https://www.gradle.org/) – Java Build Tools
 - [Android OS](https://www.android.com) – Operating Systems
 
 Full tech stack [here](/techstack.md)
@@ -16,9 +16,9 @@ Full tech stack [here](/techstack.md)
 ## Tech Stack
 maxgfr/android-youtube-api is built on the following main stack:
 
-- <img width='25' height='25' src='https://img.stackshare.io/service/975/gradlephant-social-black-bg.png' alt='Gradle'/> [Gradle](https://www.gradle.org/) – Java Build Tools
 - <img width='25' height='25' src='https://img.stackshare.io/service/995/K85ZWV2F.png' alt='Java'/> [Java](https://www.java.com) – Languages
 - <img width='25' height='25' src='https://img.stackshare.io/service/1010/m8jf0po4imu8t5eemjdd.png' alt='Android SDK'/> [Android SDK](http://developer.android.com) – Frameworks (Full Stack)
+- <img width='25' height='25' src='https://img.stackshare.io/service/975/gradlephant-social-black-bg.png' alt='Gradle'/> [Gradle](https://www.gradle.org/) – Java Build Tools
 - <img width='25' height='25' src='https://img.stackshare.io/service/9586/ZvmtaSXW_400x400.jpg' alt='Android OS'/> [Android OS](https://www.android.com) – Operating Systems
 
 Full tech stack [here](/techstack.md)
@@ -30,7 +30,7 @@ Full tech stack [here](/techstack.md)
 # Tech Stack File
 ![](https://img.stackshare.io/repo.svg "repo") [maxgfr/android-youtube-api](https://github.com/maxgfr/android-youtube-api)![](https://img.stackshare.io/public_badge.svg "public")
 <br/><br/>
-|5<br/>Tools used|01/05/24 <br/>Report generated|
+|5<br/>Tools used|02/29/24 <br/>Report generated|
 |------|------|
 </div>
 
